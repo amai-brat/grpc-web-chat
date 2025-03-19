@@ -1,16 +1,18 @@
 using System.Collections.Concurrent;
+using System.Security.Claims;
 using Chat.Service.Models;
 using Grpc.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Chat.Service.Services;
 
 public class ChatServiceV3 : Service.ChatService.ChatServiceBase
 {
     private static readonly ConcurrentDictionary<string, IServerStreamWriter<MessageResponse>> Clients = new();
-    
     private static readonly List<Message> History = [];
     private static readonly ReaderWriterLockSlim RwLock = new();
 
+    [Authorize]
     public override async Task Chat(
         IAsyncStreamReader<MessageRequest> requestStream, 
         IServerStreamWriter<MessageResponse> responseStream, 
@@ -56,7 +58,11 @@ public class ChatServiceV3 : Service.ChatService.ChatServiceBase
     {
         await foreach (var req in requestStream.ReadAllAsync(context.CancellationToken))
         {
-            var message = Message.From(req, "ABOBA");
+            var nameClaim = context.GetHttpContext().User.Claims.SingleOrDefault(x => x.Type == ClaimTypes.Name);
+            if (nameClaim is null)
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Failed to get user name"));
+           
+            var message = Message.From(req, nameClaim.Value);
             
             RwLock.EnterWriteLock();
             try

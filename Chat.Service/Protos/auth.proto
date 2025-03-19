@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option csharp_namespace = "Chat.Service";
+
+package auth;
+
+service AuthService {
+  rpc GetToken(AuthorizeRequest) returns (TokenResponse);
+}
+
+message TokenResponse {
+  string jwt_token = 1;
+}
+
+message AuthorizeRequest {
+  string name = 1;
+}

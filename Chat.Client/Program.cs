@@ -1,11 +1,22 @@
 ﻿using Chat.Client;
+using Grpc.Core;
 using Grpc.Net.Client;
 
 using var channel = GrpcChannel.ForAddress("http://localhost:5172");
-var service = new ChatService.ChatServiceClient(channel);
+var chatService = new ChatService.ChatServiceClient(channel);
+var authService = new AuthService.AuthServiceClient(channel);
 var ctSource = new CancellationTokenSource();
 
-var call = service.Chat();
+var tokenResponse = await authService.GetTokenAsync(new AuthorizeRequest
+{
+    Name = Guid.NewGuid().ToString()
+}, cancellationToken: ctSource.Token);
+
+var call = chatService.Chat(new Metadata
+{
+    { "Authorization", $"Bearer {tokenResponse.JwtToken}" }
+}, cancellationToken: ctSource.Token);
+
 var readTask = Task.Run(async () =>
 {
     while (await call.ResponseStream.MoveNext(ctSource.Token))
