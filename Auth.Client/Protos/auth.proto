@@ -1,0 +1,20 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "Auth.Client";
+
+package auth;
+
+service AuthService {
+  rpc GetToken(google.protobuf.Empty) returns (TokenResponse);
+  rpc GetSecret(google.protobuf.Empty) returns (SecretResponse);
+}
+
+message TokenResponse {
+  string jwt_token = 1;
+}
+
+message SecretResponse {
+  string secret = 1;
+}
+
