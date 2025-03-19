@@ -5,5 +5,5 @@ builder.Services.AddGrpc();
 
 var app = builder.Build();
 
-app.MapGrpcService<ChatService>();
+app.MapGrpcService<ChatServiceV3>();
 app.Run();

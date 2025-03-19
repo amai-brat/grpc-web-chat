@@ -6,8 +6,6 @@ option csharp_namespace = "Chat.Service";
 package chat;
 
 service ChatService {
-  rpc SendMessage (MessageRequest) returns (google.protobuf.Empty);
-  rpc GetMessages (google.protobuf.Empty) returns (stream MessageResponse);
   rpc Chat (stream MessageRequest) returns (stream MessageResponse);
 }
 
