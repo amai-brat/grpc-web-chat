@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 using Chat.Service.Models;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -16,7 +16,7 @@ public class ChatServiceV4 : Service.ChatService.ChatServiceBase
     [Authorize]
     public override async Task<Empty> SendMessage(MessageRequest request, ServerCallContext context)
     {
-        var nameClaim = context.GetHttpContext().User.Claims.SingleOrDefault(x => x.Type == ClaimTypes.Name);
+        var nameClaim = context.GetHttpContext().User.Claims.SingleOrDefault(x => x.Type == JwtRegisteredClaimNames.Name);
         if (nameClaim is null)
             throw new RpcException(new Status(StatusCode.Unauthenticated, "Failed to get user name"));
 

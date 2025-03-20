@@ -20,7 +20,7 @@ public class TokenGenerator(IOptionsMonitor<JwtOptions> monitor) : ITokenGenerat
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.Name, name)
+            new(JwtRegisteredClaimNames.Name, name)
         };
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
