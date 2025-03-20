@@ -33,6 +33,6 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGrpcService<ChatServiceV3>();
+app.MapGrpcService<ChatServiceV4>();
 app.MapGrpcService<AuthService>();
 app.Run();

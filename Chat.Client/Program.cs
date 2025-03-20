@@ -1,4 +1,5 @@
 ﻿using Chat.Client;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
 
@@ -12,16 +13,16 @@ var tokenResponse = await authService.GetTokenAsync(new AuthorizeRequest
     Name = Guid.NewGuid().ToString()
 }, cancellationToken: ctSource.Token);
 
-var call = chatService.Chat(new Metadata
+var getCall = chatService.GetMessages(new Empty(), new Metadata
 {
     { "Authorization", $"Bearer {tokenResponse.JwtToken}" }
 }, cancellationToken: ctSource.Token);
 
 var readTask = Task.Run(async () =>
 {
-    while (await call.ResponseStream.MoveNext(ctSource.Token))
+    while (await getCall.ResponseStream.MoveNext(ctSource.Token))
     {
-        var resp = call.ResponseStream.Current;
+        var resp = getCall.ResponseStream.Current;
         Console.WriteLine($"{resp.SenderName}: {resp.Text}");
     } 
 });
@@ -35,14 +36,16 @@ while (true)
     if (str == ":q")
     {
         ctSource.Cancel();
-        await call.RequestStream.CompleteAsync();
         break;
     }
 
-    await call.RequestStream.WriteAsync(new MessageRequest
+    await chatService.SendMessageAsync(new MessageRequest
     {
         Text = str
-    }, ctSource.Token);
+    }, headers: new Metadata
+    {
+        { "Authorization", $"Bearer {tokenResponse.JwtToken}" }
+    }, cancellationToken: ctSource.Token);
 }
 
 await readTask;
