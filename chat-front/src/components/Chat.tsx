@@ -1,7 +1,7 @@
 import { Message } from "../models/Message";
 import {useEffect, useState} from "react";
 import { ChatServiceClient } from "../protos_gen/chat.client";
-import { transport } from "../App";
+import { transport } from '../transport';
 
 
 export const Chat = () => {
@@ -12,7 +12,7 @@ export const Chat = () => {
     useEffect(() => {
        const abortController = new AbortController();
        const client = new ChatServiceClient(transport); 
-       const call = client.getMessages({}, {abort: abortController.signal});
+       const call = client.getMessages({}, {abort: abortController.signal, timeout: Infinity});
        const removeListener = call.responses.onMessage(msg => setMessages(prev => [...prev, msg]));
        // call.responses.onNext(msg => setMessages(prev => [...prev, msg]));
        setChatClient(client);

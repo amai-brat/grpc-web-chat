@@ -1,6 +1,6 @@
 import { AuthServiceClient } from '../protos_gen/auth.client';
 import {useState} from "react";
-import { transport } from "../App";
+import { transport } from '../transport';
 
 interface JoinProps {
     setIsJoined: (isJoined: boolean) => void;
