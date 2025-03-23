@@ -17,8 +17,8 @@ export const Join = ({setIsJoined}: JoinProps) => {
         console.log(tokenCall);
         
         if (tokenCall.status.code == "OK") {
-            setIsJoined(true);
             sessionStorage.setItem('token', tokenCall.response.jwtToken);
+            setIsJoined(true);
             return;
         }
     }

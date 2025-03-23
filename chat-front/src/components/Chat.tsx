@@ -10,14 +10,16 @@ export const Chat = () => {
     const [chatClient, setChatClient] = useState<ChatServiceClient>();
     
     useEffect(() => {
+       const abortController = new AbortController();
        const client = new ChatServiceClient(transport); 
-       const call = client.getMessages({});
+       const call = client.getMessages({}, {abort: abortController.signal});
        const removeListener = call.responses.onMessage(msg => setMessages(prev => [...prev, msg]));
        // call.responses.onNext(msg => setMessages(prev => [...prev, msg]));
        setChatClient(client);
        
        return () => {
            removeListener();
+           abortController.abort();
        }
     }, []);
     
