@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Chat.Service.Services;
 
-public class ChatServiceV4 : Service.ChatService.ChatServiceBase
+public class ChatServiceV4(
+    ILogger<ChatServiceV4> logger) : Service.ChatService.ChatServiceBase
 {
     private static readonly ConcurrentDictionary<string, IServerStreamWriter<MessageResponse>> Clients = new();
     private static readonly List<Message> History = [];
@@ -44,7 +45,8 @@ public class ChatServiceV4 : Service.ChatService.ChatServiceBase
     {
         var clientId = context.Peer;
         if (!Clients.TryAdd(clientId, responseStream))
-            throw new RpcException(new Status(StatusCode.Cancelled, "Failed to add client"));
+            logger.LogInformation("Failed to add client {ClientId}", clientId);
+            // throw new RpcException(new Status(StatusCode.Cancelled, "Failed to add client"));
         
         await LoadHistory(responseStream, context); 
         
